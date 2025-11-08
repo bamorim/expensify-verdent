@@ -160,7 +160,6 @@ Build the UI for managing expense categories. Admins can create, edit, and delet
   - Same validation as create form
   - Loading and error states
   - Admin-only page protection with redirect
-- Added `getCurrentMembership` procedure to organization router for client-side admin checks
 - All forms include:
   - Proper ARIA attributes for accessibility
   - Loading states during API calls

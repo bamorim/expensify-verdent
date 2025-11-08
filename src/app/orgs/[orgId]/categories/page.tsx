@@ -14,9 +14,11 @@ export default function CategoriesPage() {
     organizationId: orgId,
   });
 
-  const { data: membership } = api.organization.getCurrentMembership.useQuery({
-    organizationId: orgId,
+  const { data } = api.organization.getById.useQuery({
+    id: orgId,
   });
+
+  const membership = data?.currentUserMembership
 
   const utils = api.useUtils();
   const deleteMutation = api.category.delete.useMutation({

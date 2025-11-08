@@ -14,10 +14,12 @@ export default function NewCategoryPage() {
   const [nameError, setNameError] = useState("");
   const [descriptionError, setDescriptionError] = useState("");
 
-  const { data: membership, isLoading: membershipLoading } =
-    api.organization.getCurrentMembership.useQuery({
-      organizationId: orgId,
+  const { data, isLoading: membershipLoading } =
+    api.organization.getById.useQuery({
+      id: orgId,
     });
+
+  const membership = data?.currentUserMembership;
 
   const utils = api.useUtils()
 

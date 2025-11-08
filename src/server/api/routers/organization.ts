@@ -62,6 +62,17 @@ export const organizationRouter = createTRPCRouter({
             userId: ctx.session.user.id,
           },
         },
+        include: {
+          organization: {
+            include: {
+              memberships: {
+                include: {
+                  user: true
+                }
+              }
+            }
+          }
+        }
       });
 
       if (!membership) {
@@ -71,43 +82,12 @@ export const organizationRouter = createTRPCRouter({
         });
       }
 
-      const organization = await ctx.db.organization.findUnique({
-        where: { id: input.id },
-        include: {
-          memberships: {
-            include: {
-              user: true,
-            },
-          },
-        },
-      });
+      const {organization, ...currentUserMembership} = membership
 
       return {
-        ...organization!,
-        currentUserRole: membership.role,
+        ...organization,
+        currentUserMembership,
       };
-    }),
-
-  getCurrentMembership: protectedProcedure
-    .input(z.object({ organizationId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const membership = await ctx.db.organizationMembership.findUnique({
-        where: {
-          organizationId_userId: {
-            organizationId: input.organizationId,
-            userId: ctx.session.user.id,
-          },
-        },
-      });
-
-      if (!membership) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You are not a member of this organization",
-        });
-      }
-
-      return membership;
     }),
 
   update: protectedProcedure

@@ -23,9 +23,11 @@ export default function EditCategoryPage() {
     id: categoryId,
   });
 
-  const { data: membership } = api.organization.getCurrentMembership.useQuery({
-    organizationId: orgId,
+  const { data } = api.organization.getById.useQuery({
+    id: orgId,
   });
+
+  const membership = data?.currentUserMembership
 
   useEffect(() => {
     if (category) {
