@@ -19,8 +19,11 @@ export default function NewCategoryPage() {
       organizationId: orgId,
     });
 
+  const utils = api.useUtils()
+
   const createMutation = api.category.create.useMutation({
     onSuccess: () => {
+      void utils.category.list.invalidate();
       router.push(`/orgs/${orgId}/categories`);
     },
     onError: (error) => {
