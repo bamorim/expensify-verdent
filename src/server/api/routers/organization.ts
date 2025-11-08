@@ -82,7 +82,10 @@ export const organizationRouter = createTRPCRouter({
         },
       });
 
-      return organization;
+      return {
+        ...organization!,
+        currentUserRole: membership.role,
+      };
     }),
 
   update: protectedProcedure
@@ -250,5 +253,53 @@ export const organizationRouter = createTRPCRouter({
       });
 
       return { success: true };
+    }),
+
+  updateMemberRole: protectedProcedure
+    .input(z.object({
+      organizationId: z.string(),
+      userId: z.string(),
+      role: z.enum(["ADMIN", "MEMBER"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const adminMembership = await ctx.db.organizationMembership.findUnique({
+        where: {
+          organizationId_userId: {
+            organizationId: input.organizationId,
+            userId: ctx.session.user.id,
+          },
+        },
+      });
+
+      if (!adminMembership || adminMembership.role !== "ADMIN") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can update member roles",
+        });
+      }
+
+      if (input.userId === ctx.session.user.id) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You cannot change your own role",
+        });
+      }
+
+      const updatedMembership = await ctx.db.organizationMembership.update({
+        where: {
+          organizationId_userId: {
+            organizationId: input.organizationId,
+            userId: input.userId,
+          },
+        },
+        data: {
+          role: input.role,
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      return updatedMembership;
     }),
 });

@@ -19,6 +19,7 @@ export default function OrgLayoutClient({
     { href: `/orgs/${orgId}/policies`, label: "Policies" },
     { href: `/orgs/${orgId}/expenses`, label: "Expenses" },
     { href: `/orgs/${orgId}/reviews`, label: "Reviews" },
+    { href: `/orgs/${orgId}/settings`, label: "Settings" },
   ];
 
   return (
